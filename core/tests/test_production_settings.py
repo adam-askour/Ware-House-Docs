@@ -13,7 +13,7 @@ class ProductionSettingsTests(SimpleTestCase):
         env = os.environ.copy()
         env.update(overrides)
         env["DJANGO_SETTINGS_MODULE"] = "config.settings.production"
-        return subprocess.run(
+        return subprocess.run(  # noqa: S603 - fixed interpreter and command
             [sys.executable, "-c", "import django; django.setup()"],
             cwd=ROOT,
             env=env,

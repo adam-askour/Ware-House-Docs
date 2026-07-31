@@ -1,6 +1,6 @@
 from .base import *  # noqa: F403
 
-SECRET_KEY = "test-key-not-used-outside-tests"
+SECRET_KEY = "test-key-not-used-outside-tests"  # noqa: S105
 DEBUG = False
 ALLOWED_HOSTS = ["testserver"]
 DATABASES = {
