@@ -1,11 +1,27 @@
 # Current Project Status
 
-Last updated: 2026-07-30 (Africa/Casablanca)
+Last updated: 2026-07-31 (Africa/Casablanca)
 
 ## Current milestone
 
-Phase 0 infrastructure is complete and operational. Do not begin Phase 1
-implementation until the user explicitly asks to continue.
+Phase 0 infrastructure is complete and operational. Phase 1 implementation is
+now underway.
+
+The repository checkpoint is commit `fb6fdaa` on `main`, synchronized with
+`origin/main`. The working tree was clean when this status was recorded.
+
+## Latest verification and cleanup
+
+The final Phase 0 cleanup corrected Django import resolution and configuration
+warnings:
+
+- Configured VS Code to use the project's local `.venv` interpreter.
+- Enabled pytest discovery in VS Code.
+- Added explicit imports required by development and production settings.
+- Sorted the base-settings imports.
+- Suppressed justified security-linter false positives in test-only code.
+- Verified the Django ASGI and WSGI imports.
+- Confirmed Ruff checks, Django system checks, and the full test suite pass.
 
 ## Running environment
 
@@ -74,7 +90,8 @@ using the full path shown above.
 
 ## Next step
 
-Review Phase 1 in `planning/IMPLEMENTATION_ROADMAP.md` with the user and confirm
-the first feature slice, roles and permissions, organization structure, initial
-data models, and first usable screen. Make no Phase 1 changes before receiving
-explicit approval.
+Complete the remaining Phase 1 authentication hardening and protected-resource
+integration. The first implemented slice provides the custom user, department
+membership, department-chief role, reviewer flag, scanner identity,
+confidential grants, administrator management, and reusable deny-by-default
+policy helpers.

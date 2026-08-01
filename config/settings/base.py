@@ -32,6 +32,11 @@ LOCAL_APPS = [
     "dashboards",
 ]
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS
+AUTH_USER_MODEL = "accounts.User"
+AUTHENTICATION_BACKENDS = ["accounts.backends.UsernameOrEmailBackend"]
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "admin:index"
+LOGOUT_REDIRECT_URL = "login"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
