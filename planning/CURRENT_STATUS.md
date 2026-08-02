@@ -1,97 +1,58 @@
 # Current Project Status
 
-Last updated: 2026-07-31 (Africa/Casablanca)
+Last updated: 2026-08-02 (Africa/Casablanca)
 
 ## Current milestone
 
-Phase 0 infrastructure is complete and operational. Phase 1 implementation is
-now underway.
+Phase 0 infrastructure and Phase 1 identity, organization, and authorization
+are complete. The next milestone is Phase 2 document core and manual upload.
 
-The repository checkpoint is commit `fb6fdaa` on `main`, synchronized with
-`origin/main`. The working tree was clean when this status was recorded.
+## Phase 1 delivered
 
-## Latest verification and cleanup
+- Custom user model with unique email, scanner code, reviewer status, and
+  active/deactivated account controls.
+- Authentication by username or email, plus login, logout, and password-change
+  routes and templates.
+- Departments with multi-department user memberships.
+- Employee and department-chief roles scoped per department.
+- Explicit confidential authorizations independent from Django staff and
+  superuser permissions.
+- Reusable deny-by-default access-policy helpers.
+- Django administrator management for users, departments, memberships, chief
+  assignments, reviewer status, scanner codes, and confidential grants.
+- User administration displays department memberships and explicit
+  confidential authorizations together.
+- Protected-resource and direct-admin-URL tests verify denied responses do not
+  expose protected content.
 
-The final Phase 0 cleanup corrected Django import resolution and configuration
-warnings:
+## Phase 1 verification
 
-- Configured VS Code to use the project's local `.venv` interpreter.
-- Enabled pytest discovery in VS Code.
-- Added explicit imports required by development and production settings.
-- Sorted the base-settings imports.
-- Suppressed justified security-linter false positives in test-only code.
-- Verified the Django ASGI and WSGI imports.
-- Confirmed Ruff checks, Django system checks, and the full test suite pass.
+Verified on 2026-08-02:
+
+- Full test suite: 22 passed.
+- Ruff linting: passed.
+- Django system checks: passed with no issues.
+- Migration consistency check: no changes detected.
+
+The Phase 1 exit criterion is satisfied: role and department rules are enforced
+server-side, and administrator status does not implicitly grant confidential
+access.
 
 ## Running environment
 
-The complete Docker Compose stack was built, initialized, and verified:
+The Docker Compose environment established in Phase 0 contains PostgreSQL,
+Redis, Django/Gunicorn, Celery worker, Celery Beat, and the Nginx TLS gateway.
+The local development certificate is self-signed.
 
-- PostgreSQL 17.6: running and healthy
-- Redis 8.2: running and healthy
-- Django/Gunicorn web service: running and healthy
-- Celery worker: running
-- Celery Beat scheduler: running
-- Nginx TLS gateway: running on host port 443
-
-The HTTPS health endpoint returned `200 OK` at:
-
-```text
-https://localhost/health/
-```
-
-The certificate is self-signed for local development, so browsers will show a
-certificate warning unless it is added to the local trust store.
-
-## Initialization completed
-
-- Created the ignored local `.env` with development deployment secrets.
-- Generated ignored local TLS files:
-  - `deploy/certs/dms.crt`
-  - `deploy/certs/dms.key`
-- Applied all current Django migrations.
-- Collected 127 static files.
-- Ran `python manage.py check --deploy` successfully with no issues.
-
-## Project fixes made
-
-- Added the missing `dashboards` Python package required by
-  `INSTALLED_APPS`.
-- Corrected the web container health check so it supplies
-  `X-Forwarded-Proto: https` and is not rejected by Django's HTTPS redirect.
-- Configured Celery Beat to store its schedule at
-  `/tmp/celerybeat-schedule`, which is writable by the non-root container user.
-
-## Docker note
-
-Docker Desktop initially cached a failure from before WSL 2 was available.
-Restarting WSL and Docker Desktop resolved it. Docker Desktop 4.84.0,
-Docker Engine 29.6.2, and Docker Compose 5.3.1 were verified.
-
-In a PowerShell session where `docker` is not yet on `PATH`, the executable is:
+If `docker` is not available on `PATH`, its verified location is:
 
 ```text
 C:\Users\PC\AppData\Local\Programs\DockerDesktop\resources\bin\docker.exe
 ```
 
-## Useful commands
-
-Run these from the project root:
-
-```powershell
-docker compose ps
-docker compose logs --tail 100
-docker compose up -d
-docker compose down
-```
-
-If `docker` is not recognized, restart the terminal or invoke the executable
-using the full path shown above.
-
 ## Next step
 
-Complete the remaining Phase 1 authentication hardening and protected-resource
-integration. The first implemented slice provides the custom user, department
-membership, department-chief role, reviewer flag, scanner identity,
-confidential grants, administrator management, and reusable deny-by-default
-policy helpers.
+Begin Phase 2 with document, department assignment, metadata, storage, version,
+and status models. Then add protected PDF validation and storage, manual upload
+and listing, permission-checked file serving, and audit events for upload, view,
+and download.
