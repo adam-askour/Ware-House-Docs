@@ -16,3 +16,9 @@ var/*
 !var/static/.gitkeep
 backups/
 *.log
+
+# Locally generated TLS private keys must never be committed.
+deploy/certs/*.key
+deploy/certs/*.pem
+deploy/certs/*.p12
+deploy/certs/*.pfx
