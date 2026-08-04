@@ -48,9 +48,39 @@ def test_administrator_does_not_automatically_receive_confidential_access():
     assert AccessPolicy.has_confidential_authorization(admin, department, "Legal confidential")
 
 
+def test_confidential_authorization_label_is_case_insensitive():
+    user = make_user("sam")
+    department = Department.objects.create(name="Payroll", code="payroll")
+    ConfidentialAuthorization.objects.create(
+        user=user, department=department, label="Payroll confidential"
+    )
+
+    assert AccessPolicy.has_confidential_authorization(
+        user, department, "payroll confidential"
+    )
+    assert not AccessPolicy.has_confidential_authorization(
+        user, department, "payroll restricted"
+    )
+
+
 def test_inactive_membership_and_user_are_denied():
     user = make_user("sam")
     department = Department.objects.create(name="Legal", code="legal")
     Membership.objects.create(user=user, department=department, role=Membership.Role.CHIEF, is_active=False)
     assert not AccessPolicy.is_department_member(user, department)
     assert not AccessPolicy.is_department_chief(user, department)
+
+
+def test_inactive_department_denies_all_department_scoped_access():
+    user = make_user("sam")
+    department = Department.objects.create(name="Legal", code="legal", is_active=False)
+    Membership.objects.create(user=user, department=department, role=Membership.Role.CHIEF)
+    ConfidentialAuthorization.objects.create(
+        user=user, department=department, label="Legal confidential"
+    )
+
+    assert not AccessPolicy.is_department_member(user, department)
+    assert not AccessPolicy.is_department_chief(user, department)
+    assert not AccessPolicy.has_confidential_authorization(
+        user, department, "Legal confidential"
+    )

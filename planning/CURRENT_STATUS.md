@@ -1,6 +1,6 @@
 # Current Project Status
 
-Last updated: 2026-08-02 (Africa/Casablanca)
+Last updated: 2026-08-04 (Africa/Casablanca)
 
 ## Current milestone
 
@@ -18,6 +18,10 @@ are complete. The next milestone is Phase 2 document core and manual upload.
 - Explicit confidential authorizations independent from Django staff and
   superuser permissions.
 - Reusable deny-by-default access-policy helpers.
+- Department-scoped policies deny access when the department is inactive.
+- Confidential free-text label checks use case-insensitive exact matching.
+- Authenticated employee landing page; ordinary users are no longer redirected
+  to Django administration after login.
 - Django administrator management for users, departments, memberships, chief
   assignments, reviewer status, scanner codes, and confidential grants.
 - User administration displays department memberships and explicit
@@ -27,9 +31,9 @@ are complete. The next milestone is Phase 2 document core and manual upload.
 
 ## Phase 1 verification
 
-Verified on 2026-08-02:
+Verified on 2026-08-04:
 
-- Full test suite: 22 passed.
+- Full test suite: 25 passed.
 - Ruff linting: passed.
 - Django system checks: passed with no issues.
 - Migration consistency check: no changes detected.
@@ -56,3 +60,7 @@ Begin Phase 2 with document, department assignment, metadata, storage, version,
 and status models. Then add protected PDF validation and storage, manual upload
 and listing, permission-checked file serving, and audit events for upload, view,
 and download.
+
+Before confidential labels become broadly configurable, replace their current
+free-text representation with a dedicated model or controlled choices. Label
+authorization checks are case-insensitive in the interim.

@@ -1,7 +1,16 @@
+from django.contrib.auth.decorators import login_required
 from django.db import connections
 from django.http import JsonResponse
+from django.shortcuts import render
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET
+
+
+@login_required
+@require_GET
+def home(request):
+    """Authenticated landing page until the Phase 2 document list replaces it."""
+    return render(request, "core/home.html")
 
 
 @require_GET

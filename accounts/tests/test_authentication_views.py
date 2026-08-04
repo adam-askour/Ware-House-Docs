@@ -29,8 +29,21 @@ def test_user_can_log_in_with_email_through_login_page(client):
     )
 
     assert response.status_code == 302
-    assert response.url == reverse("admin:index")
+    assert response.url == reverse("core:home")
     assert client.session["_auth_user_id"] == str(user.pk)
+
+
+def test_employee_landing_page_requires_login_and_accepts_non_staff_user(client):
+    anonymous_response = client.get(reverse("core:home"))
+    assert anonymous_response.status_code == 302
+    assert anonymous_response.url.startswith(reverse("login"))
+
+    client.force_login(make_user())
+    response = client.get(reverse("core:home"))
+
+    assert response.status_code == 200
+    assert b"Welcome" in response.content
+    assert b"Administration" not in response.content
 
 
 def test_password_change_pages_render_for_authenticated_user(client):

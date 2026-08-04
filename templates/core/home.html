@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Home | Document Management System{% endblock %}
+
+{% block content %}
+  <h1>Welcome, {{ request.user.get_full_name|default:request.user.username }}</h1>
+  <p>Your document workspace will be available here as Phase 2 is completed.</p>
+  <nav aria-label="Account actions">
+    <a href="{% url 'password_change' %}">Change password</a>
+    {% if request.user.is_staff %}
+      <a href="{% url 'admin:index' %}">Administration</a>
+    {% endif %}
+  </nav>
+  <form method="post" action="{% url 'logout' %}">
+    {% csrf_token %}
+    <button type="submit">Sign out</button>
+  </form>
+{% endblock %}
