@@ -1,3 +1,5 @@
+from django.db.models import Q
+
 from organization.models import ConfidentialAuthorization, Membership
 
 
@@ -46,3 +48,38 @@ class AccessPolicy:
             # presentation, while keeping the actual wording an exact match.
             grants = grants.filter(label__iexact=label)
         return grants.exists()
+
+    @staticmethod
+    def visible_documents(user):
+        from documents.models import Document
+
+        if not user.is_authenticated or not user.is_active:
+            return Document.objects.none()
+        department_ids = Membership.objects.filter(
+            user=user, is_active=True, department__is_active=True
+        ).values_list("department_id", flat=True)
+        allowed = Q(
+            sensitivity=Document.Sensitivity.NORMAL,
+            assignments__department_id__in=department_ids,
+        )
+        confidential = Q()
+        grants = ConfidentialAuthorization.objects.filter(
+            user=user, is_active=True, department__is_active=True
+        ).values_list("department_id", "label")
+        for department_id, label in grants:
+            confidential |= Q(
+                sensitivity=Document.Sensitivity.CONFIDENTIAL,
+                confidential_label__iexact=label,
+                assignments__department_id=department_id,
+            )
+        return Document.objects.filter(allowed | confidential).distinct()
+
+    @staticmethod
+    def can_upload_to(user, department, sensitivity, label="") -> bool:
+        from documents.models import Document
+
+        if not AccessPolicy.is_department_member(user, department):
+            return False
+        if sensitivity == Document.Sensitivity.CONFIDENTIAL:
+            return AccessPolicy.has_confidential_authorization(user, department, label)
+        return sensitivity == Document.Sensitivity.NORMAL

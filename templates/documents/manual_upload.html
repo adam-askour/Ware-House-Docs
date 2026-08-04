@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Upload PDF | Document Management System{% endblock %}
+{% block content %}
+  <h1>Upload a PDF</h1>
+  <p><a href="{% url 'documents:list' %}">Back to documents</a></p>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Upload securely</button>
+  </form>
+{% endblock %}

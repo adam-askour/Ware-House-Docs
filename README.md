@@ -6,10 +6,10 @@ management.
 
 ## Current state
 
-Phase 0 establishes the modular application, environment-specific security
-settings, PostgreSQL/Redis/Celery topology, protected storage, health checks,
-Nginx TLS boundary, structured logging, and automated checks. Product features
-are added strictly in the order in `planning/IMPLEMENTATION_ROADMAP.md`.
+Phases 0–2 provide the infrastructure, identity and department authorization,
+protected PDF storage, manual upload, permission-filtered listing, protected
+preview/download endpoints, and document access auditing. Product features are
+added strictly in the order in `planning/IMPLEMENTATION_ROADMAP.md`.
 
 ## Local development
 

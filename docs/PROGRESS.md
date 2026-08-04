@@ -32,22 +32,35 @@ Phase 1 is complete. Its exit criterion is satisfied: role and department rules
 are enforced server-side, and administrator status does not implicitly grant
 confidential access.
 
+## Phase 2 — Document core and manual upload
+
+- [x] Document, department assignment, metadata, protected storage, version,
+  and status-history models
+- [x] Randomized protected original paths with SHA-256 checksums
+- [x] Parsed PDF validation rejecting renamed, corrupt, and encrypted files
+- [x] Department- and confidentiality-authorized manual upload
+- [x] Permission-filtered document landing page and basic filters
+- [x] Permission-checked preview and download endpoints
+- [x] Upload, view, and download audit events
+- [x] Primary-department publication and single-primary constraints
+
+Phase 2 is complete. Its exit criterion is satisfied: authorized employees can
+upload, list, preview, and download test PDFs, while unauthorized requests
+receive no protected content.
+
 ## Current verification
 
 Verified on 2026-08-04:
 
-- Full test suite: 25 passed
+- Full test suite: 32 passed
 - Ruff linting: passed
 - Django system checks: passed with no issues
 - Migration consistency check: no changes detected
 
 ## Next milestone
 
-Phase 2 — document core and manual upload. This includes document and version
-models, protected PDF validation and storage, manual upload and listing,
-permission-checked file serving, and upload/view/download audit events.
-
-The employee landing page is intentionally minimal until the Phase 2 document
-list becomes its primary content. Confidential labels should later move from
-free text to a dedicated model or controlled choices. Reviewer scope must also
-be defined before reviewer status is used as a document-access grant.
+Phase 3 — scanner simulator and ingestion. This includes scanner records,
+stable-file detection, an idempotent ingestion ledger, duplicate detection,
+quarantine/failure handling, and immediate Processing documents. Reviewer
+scope must be defined before reviewer status is used as a document-access
+grant.

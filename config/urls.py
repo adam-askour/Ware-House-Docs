@@ -12,5 +12,6 @@ urlpatterns = [
         auth_views.PasswordChangeDoneView.as_view(),
         name="password_change_done",
     ),
+    path("documents/", include("documents.urls")),
     path("", include("core.urls")),
 ]

@@ -4,8 +4,9 @@ Last updated: 2026-08-04 (Africa/Casablanca)
 
 ## Current milestone
 
-Phase 0 infrastructure and Phase 1 identity, organization, and authorization
-are complete. The next milestone is Phase 2 document core and manual upload.
+Phase 0 infrastructure, Phase 1 identity and authorization, and Phase 2
+document core and manual upload are complete. The next milestone is Phase 3
+scanner simulation and ingestion.
 
 ## Phase 1 delivered
 
@@ -29,18 +30,33 @@ are complete. The next milestone is Phase 2 document core and manual upload.
 - Protected-resource and direct-admin-URL tests verify denied responses do not
   expose protected content.
 
-## Phase 1 verification
+## Phase 2 delivered
+
+- Document, primary/additional department, metadata, stored-file, version, and
+  status-history models.
+- Protected randomized storage paths and SHA-256 integrity checksums.
+- Parsed PDF-only validation that rejects renamed, corrupt, and encrypted PDFs.
+- Manual uploads limited to active department memberships and explicit
+  confidentiality grants.
+- Permission-filtered document landing page with department/status filters.
+- Protected inline preview and attachment download responses with private,
+  no-store caching.
+- Audit events for successful upload, view, and download actions.
+- Database constraints for unique assignments, versions, metadata keys, and a
+  single primary department; publication validation requires a primary.
+
+## Phase 2 verification
 
 Verified on 2026-08-04:
 
-- Full test suite: 25 passed.
+- Full test suite: 32 passed.
 - Ruff linting: passed.
 - Django system checks: passed with no issues.
 - Migration consistency check: no changes detected.
 
-The Phase 1 exit criterion is satisfied: role and department rules are enforced
-server-side, and administrator status does not implicitly grant confidential
-access.
+The Phase 2 exit criterion is satisfied: authorized employees can safely
+upload, list, preview, and download test PDFs, and unauthorized users cannot
+discover or retrieve their contents.
 
 ## Running environment
 
@@ -56,11 +72,7 @@ C:\Users\PC\AppData\Local\Programs\DockerDesktop\resources\bin\docker.exe
 
 ## Next step
 
-Begin Phase 2 with document, department assignment, metadata, storage, version,
-and status models. Then add protected PDF validation and storage, manual upload
-and listing, permission-checked file serving, and audit events for upload, view,
-and download.
-
-Before confidential labels become broadly configurable, replace their current
-free-text representation with a dedicated model or controlled choices. Label
-authorization checks are case-insensitive in the interim.
+Begin Phase 3 with scanner records and intake configuration, followed by a
+scanner simulator, stable-file detection, an idempotent ingestion ledger,
+checksum-based duplicate handling, quarantine/failure areas, and immediate
+Processing document creation.

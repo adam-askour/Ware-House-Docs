@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Documents | Document Management System{% endblock %}
+{% block content %}
+  <header>
+    <h1>Documents</h1>
+    <p>Welcome, {{ request.user.get_full_name|default:request.user.username }}.</p>
+    <nav aria-label="Document and account actions">
+      <a href="{% url 'documents:upload' %}">Upload PDF</a>
+      <a href="{% url 'password_change' %}">Change password</a>
+      {% if request.user.is_staff %}<a href="{% url 'admin:index' %}">Administration</a>{% endif %}
+    </nav>
+    <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit">Sign out</button></form>
+  </header>
+  <form method="get">
+    <label for="status">Status</label>
+    <select id="status" name="status">
+      <option value="">All statuses</option>
+      {% for value, label in statuses %}<option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+    <label for="department">Department code</label>
+    <input id="department" name="department" value="{{ request.GET.department }}">
+    <button type="submit">Filter</button>
+  </form>
+  {% if documents %}
+    <table>
+      <thead><tr><th>Title</th><th>Department</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>{% for document in documents %}<tr>
+        <td>{{ document.title }}</td>
+        <td>{% for assignment in document.assignments.all %}{{ assignment.department.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+        <td>{{ document.get_status_display }}</td>
+        <td><a href="{% url 'documents:preview' document.pk %}">Preview</a> <a href="{% url 'documents:download' document.pk %}">Download</a></td>
+      </tr>{% endfor %}</tbody>
+    </table>
+  {% else %}<p>No accessible documents found.</p>{% endif %}
+{% endblock %}
