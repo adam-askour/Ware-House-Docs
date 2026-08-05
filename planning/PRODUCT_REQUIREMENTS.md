@@ -84,7 +84,8 @@ The system records which rules, templates, source signals, and classifier output
 
 - View authorized personal, department, and shared documents
 - See their scans immediately
-- Upload PDFs manually
+- Scan and upload documents as normal only; employees must give known confidential
+  documents to a person with the corresponding explicit confidential authorization
 - Search authorized content
 - Confirm or correct uncertain normal classifications
 - Correct permitted metadata
@@ -119,6 +120,11 @@ The system records which rules, templates, source signals, and classifier output
 ### Confidential authorization
 
 Additional authorization such as `HR confidential`, `Accounting confidential`, or `Legal confidential` can be granted independently of a user's normal department role.
+Only a user holding the matching active authorization may select or confirm a
+confidential classification. The option is hidden from ordinary employees and the
+same rule is enforced server-side. If processing later suspects that a normal scan
+is confidential, publication stops and the document is routed to an appropriately
+authorized review queue without exposing its content or metadata.
 
 ## 7. Authentication and scanner identity
 
@@ -568,4 +574,3 @@ The prototype is acceptable when:
 18. Failed processing retries safely and is visible to the administrator.
 19. Daily backup jobs report success or failure.
 20. Core automated tests pass and setup documentation can reproduce the prototype.
-

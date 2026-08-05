@@ -11,6 +11,7 @@ from django.urls import reverse
 from pypdf import PdfWriter
 
 from audit.models import AuditEvent
+from documents.forms import ManualUploadForm
 from documents.models import Document, DocumentDepartment
 from documents.services import validate_pdf
 from organization.models import ConfidentialAuthorization, Department, Membership
@@ -156,3 +157,31 @@ def test_confidential_document_requires_matching_explicit_grant(client, tmp_path
         accepted = upload(client, department, **data)
         assert accepted.status_code == 302
         assert b"Safety procedure" in client.get(reverse("documents:list")).content
+
+
+def test_ordinary_employee_is_not_offered_confidential_classification(client):
+    user = make_user("ordinary")
+    department = Department.objects.create(name="Warehouse", code="warehouse")
+    Membership.objects.create(user=user, department=department)
+
+    form = ManualUploadForm(user=user)
+    assert form.fields["sensitivity"].choices == [(Document.Sensitivity.NORMAL, "Normal")]
+
+    client.force_login(user)
+    response = client.get(reverse("documents:upload"))
+    assert response.status_code == 200
+    assert b'value="confidential"' not in response.content
+
+
+def test_authorized_employee_is_offered_confidential_classification():
+    user = make_user("confidential-authorized")
+    department = Department.objects.create(name="Legal", code="legal")
+    Membership.objects.create(user=user, department=department)
+    ConfidentialAuthorization.objects.create(
+        user=user, department=department, label="Legal confidential"
+    )
+
+    form = ManualUploadForm(user=user)
+    assert (Document.Sensitivity.CONFIDENTIAL, "Confidential") in form.fields[
+        "sensitivity"
+    ].choices

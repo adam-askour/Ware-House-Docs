@@ -96,6 +96,11 @@
 
 - partially written file is not consumed
 - unknown/inactive employee code is quarantined or reviewed
+- ordinary employees cannot submit a confidential classification, including through
+  a crafted request; known confidential documents must be scanned by a user with the
+  matching explicit authorization
+- a scan later suspected to be confidential is withheld from publication and routed
+  to an appropriately authorized review queue without leaking restricted metadata
 - repeated event does not create a second unintended document
 - transient failure retries without data loss
 - successful import associates the correct employee and scanner
@@ -311,4 +316,3 @@ Each sample needs expected:
 - file completion/rename behavior
 - maximum and typical PDF size
 - network details and protected destination
-

@@ -17,19 +17,31 @@ class ManualUploadForm(forms.Form):
     def __init__(self, *args, user, **kwargs):
         super().__init__(*args, **kwargs)
         self.user = user
-        self.fields["department"].queryset = Department.objects.filter(
+        departments = Department.objects.filter(
             membership__user=user,
             membership__is_active=True,
             is_active=True,
         ).distinct()
+        self.fields["department"].queryset = departments
         labels = (
             user.confidentialauthorization_set.filter(
-                is_active=True, department__is_active=True
+                is_active=True,
+                department__in=departments,
+                department__is_active=True,
             )
             .order_by("label")
             .values_list("label", flat=True)
             .distinct()
         )
+        labels = list(labels)
+        # Ordinary employees may submit normal documents only. Confidential is
+        # presented as an option only when the user has an explicit, active
+        # confidential authorization in one of their active departments.
+        self.fields["sensitivity"].choices = [(Document.Sensitivity.NORMAL, "Normal")]
+        if labels:
+            self.fields["sensitivity"].choices.append(
+                (Document.Sensitivity.CONFIDENTIAL, "Confidential")
+            )
         self.fields["confidential_label"].choices = [("", "---------")] + [
             (label, label) for label in labels
         ]
