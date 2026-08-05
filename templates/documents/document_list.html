@@ -7,7 +7,7 @@
     <nav aria-label="Document and account actions">
       <a href="{% url 'documents:upload' %}">Upload PDF</a>
       <a href="{% url 'password_change' %}">Change password</a>
-      {% if request.user.is_staff %}<a href="{% url 'admin:index' %}">Administration</a>{% endif %}
+      {% if request.user.is_superuser %}<a href="{% url 'admin:index' %}">Administration</a>{% endif %}
     </nav>
     <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit">Sign out</button></form>
   </header>

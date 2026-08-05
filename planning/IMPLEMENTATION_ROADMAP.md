@@ -37,7 +37,7 @@
 - custom user model
 - local login/logout and password management
 - departments and multi-department memberships
-- employee, chief, reviewer, administrator, and confidential authorizations
+- employee, department chief, superuser administrator, and confidential authorizations
 - active/deactivated accounts
 - scanner codes
 - reusable document-access policy service

@@ -32,7 +32,7 @@ The primary product promise is:
 8. Classify documents by type, one primary department, additional departments, and sensitivity.
 9. Automatically publish reliable ordinary documents.
 10. Route uncertain normal documents to the scanning employee.
-11. Route sensitive or conflicting cases to an authorized reviewer.
+11. Route sensitive or conflicting cases to the responsible department chief.
 12. Enforce access before returning search results, previews, or files.
 13. Allow manual PDF uploads through the same processing pipeline.
 14. Maintain versions, notifications, retention, a recycle bin, daily backups, and an immutable audit trail.
@@ -102,12 +102,7 @@ The system records which rules, templates, source signals, and classifier output
 - Approve deletion requests
 - Restore department documents
 - View department dashboards and department-scoped audit activity
-
-### Document reviewer
-
-- Review assigned uncertain, sensitive, duplicate, or conflicting cases
-- Correct type, departments, sensitivity, metadata, and access
-- Reassign a review when authorized
+- Resolve sensitive, duplicate, conflicting, or access-ambiguous cases for the department
 
 ### System administrator
 
@@ -241,7 +236,7 @@ Processing status and business status are separate fields.
 
 - Reliable, ordinary, permitted: publish automatically as `Ready`.
 - Uncertain but ordinary: `Needs employee review`.
-- Sensitive, conflicting, or access-ambiguous: `Needs authorized review`.
+- Sensitive, conflicting, or access-ambiguous: department-chief review.
 - Technical failure: retain safely, retry, then notify administrator.
 - Quarantined: no preview or content access for ordinary users.
 

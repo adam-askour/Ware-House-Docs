@@ -10,8 +10,8 @@ scanner simulation and ingestion.
 
 ## Phase 1 delivered
 
-- Custom user model with unique email, scanner code, reviewer status, and
-  active/deactivated account controls.
+- Custom user model with unique email, scanner code, and active/deactivated
+  account controls.
 - Authentication by username or email, plus login, logout, and password-change
   routes and templates.
 - Departments with multi-department user memberships.
@@ -23,8 +23,8 @@ scanner simulation and ingestion.
 - Confidential free-text label checks use case-insensitive exact matching.
 - Authenticated employee landing page; ordinary users are no longer redirected
   to Django administration after login.
-- Django administrator management for users, departments, memberships, chief
-  assignments, reviewer status, scanner codes, and confidential grants.
+- Django superuser management for users, departments, memberships, chief
+  assignments, scanner codes, and confidential grants.
 - User administration displays department memberships and explicit
   confidential authorizations together.
 - Protected-resource and direct-admin-URL tests verify denied responses do not

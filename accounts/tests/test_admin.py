@@ -16,9 +16,9 @@ def make_user(username, **kwargs):
     )
 
 
-def test_user_admin_displays_roles_and_explicit_confidential_grants(client):
+def test_user_admin_displays_department_roles_and_explicit_confidential_grants(client):
     administrator = make_user("admin", is_staff=True, is_superuser=True)
-    employee = make_user("employee", scanner_code="SCAN-001", is_reviewer=True)
+    employee = make_user("employee", scanner_code="SCAN-001")
     department = Department.objects.create(name="Legal", code="legal")
     Membership.objects.create(user=employee, department=department, role=Membership.Role.CHIEF)
     ConfidentialAuthorization.objects.create(
@@ -36,6 +36,8 @@ def test_user_admin_displays_roles_and_explicit_confidential_grants(client):
     assert b"department memberships" in content
     assert b"explicit confidential authorizations" in content
     assert b"Legal confidential" in response.content
+    assert b"staff status" not in content
+    assert b"reviewer" not in content
 
 
 def test_creating_administrator_does_not_create_confidential_grant(client):

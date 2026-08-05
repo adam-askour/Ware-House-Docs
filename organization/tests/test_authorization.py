@@ -48,6 +48,15 @@ def test_administrator_does_not_automatically_receive_confidential_access():
     assert AccessPolicy.has_confidential_authorization(admin, department, "Legal confidential")
 
 
+def test_chief_receives_confidential_access_without_staff_or_explicit_grant():
+    chief = make_user("chief")
+    department = Department.objects.create(name="Compliance", code="compliance")
+    Membership.objects.create(user=chief, department=department, role=Membership.Role.CHIEF)
+
+    assert not chief.is_staff
+    assert AccessPolicy.has_confidential_authorization(chief, department, "Any label")
+
+
 def test_confidential_authorization_label_is_case_insensitive():
     user = make_user("sam")
     department = Department.objects.create(name="Payroll", code="payroll")

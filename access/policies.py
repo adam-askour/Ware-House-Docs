@@ -37,6 +37,10 @@ class AccessPolicy:
     def has_confidential_authorization(user, department, label=None) -> bool:
         if not user.is_authenticated or not user.is_active:
             return False
+        # An active department chief is responsible for the whole department,
+        # so the role itself grants access to every confidential label there.
+        if AccessPolicy.is_department_chief(user, department):
+            return True
         grants = ConfidentialAuthorization.objects.filter(
             user=user,
             department=department,
@@ -62,7 +66,16 @@ class AccessPolicy:
             sensitivity=Document.Sensitivity.NORMAL,
             assignments__department_id__in=department_ids,
         )
-        confidential = Q()
+        chief_department_ids = Membership.objects.filter(
+            user=user,
+            role=Membership.Role.CHIEF,
+            is_active=True,
+            department__is_active=True,
+        ).values_list("department_id", flat=True)
+        confidential = Q(
+            sensitivity=Document.Sensitivity.CONFIDENTIAL,
+            assignments__department_id__in=chief_department_ids,
+        )
         grants = ConfidentialAuthorization.objects.filter(
             user=user, is_active=True, department__is_active=True
         ).values_list("department_id", "label")

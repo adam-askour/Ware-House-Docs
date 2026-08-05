@@ -61,6 +61,5 @@ Verified on 2026-08-04:
 
 Phase 3 — scanner simulator and ingestion. This includes scanner records,
 stable-file detection, an idempotent ingestion ledger, duplicate detection,
-quarantine/failure handling, and immediate Processing documents. Reviewer
-scope must be defined before reviewer status is used as a document-access
-grant.
+  quarantine/failure handling, and immediate Processing documents. Uncertain
+  scans return to the scanning employee, with department-chief escalation.

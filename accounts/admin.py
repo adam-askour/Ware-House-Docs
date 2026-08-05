@@ -22,11 +22,19 @@ class ConfidentialAuthorizationInline(admin.TabularInline):
 
 @admin.register(User)
 class DmsUserAdmin(UserAdmin):
-    fieldsets = UserAdmin.fieldsets + (("Document management", {"fields": ("scanner_code", "is_reviewer")}),)
-    add_fieldsets = UserAdmin.add_fieldsets + (
-        ("Document management", {"fields": ("email", "scanner_code", "is_reviewer")}),
+    # Staff/group/permission flags are intentionally absent: administrator
+    # access is reserved for superusers created through the management command.
+    fieldsets = (
+        (None, {"fields": ("username", "password")}),
+        ("Personal info", {"fields": ("first_name", "last_name", "email")}),
+        ("Account status", {"fields": ("is_active",)}),
+        ("Document management", {"fields": ("scanner_code",)}),
+        ("Important dates", {"fields": ("last_login", "date_joined")}),
     )
-    list_display = ("username", "email", "is_active", "is_reviewer", "is_staff")
-    list_filter = ("is_active", "is_reviewer", "is_staff", "is_superuser")
+    add_fieldsets = UserAdmin.add_fieldsets + (
+        ("Document management", {"fields": ("email", "scanner_code")}),
+    )
+    list_display = ("username", "email", "is_active")
+    list_filter = ("is_active",)
     search_fields = ("username", "email", "first_name", "last_name", "scanner_code")
     inlines = (MembershipInline, ConfidentialAuthorizationInline)
