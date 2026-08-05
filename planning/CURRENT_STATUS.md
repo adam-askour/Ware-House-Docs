@@ -72,7 +72,13 @@ C:\Users\PC\AppData\Local\Programs\DockerDesktop\resources\bin\docker.exe
 
 ## Next step
 
-Begin Phase 3 with scanner records and intake configuration, followed by a
-scanner simulator, stable-file detection, an idempotent ingestion ledger,
+Begin Phase 3: scanner simulation and ingestion.
+
+The agreed implementation estimate is 8–12 focused working hours (roughly one
+long development day or two normal development days), with up to 14–16 hours
+if Docker or Celery integration exposes unexpected issues.
+
+Start with scanner records and intake configuration, followed by a scanner
+simulator, stable-file detection, an idempotent ingestion ledger,
 checksum-based duplicate handling, quarantine/failure areas, and immediate
 Processing document creation.
