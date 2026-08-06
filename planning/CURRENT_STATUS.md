@@ -15,7 +15,9 @@ complete. The next milestone is Phase 4 OCR and searchable PDF generation.
 - Authentication by username or email, plus login, logout, and password-change
   routes and templates.
 - Departments with multi-department user memberships.
-- Employee and department-chief roles scoped per department.
+- Employee, supervisor, and department-chief roles scoped per department.
+- Three-level document visibility: normal documents for all department members,
+  supervisor documents for supervisors and chiefs, and chief-only documents.
 - Explicit confidential authorizations independent from Django staff and
   superuser permissions.
 - Reusable deny-by-default access-policy helpers.

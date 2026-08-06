@@ -11,7 +11,7 @@ class ManualUploadForm(forms.Form):
     title = forms.CharField(max_length=255)
     department = forms.ModelChoiceField(queryset=Department.objects.none())
     sensitivity = forms.ChoiceField(choices=Document.Sensitivity.choices)
-    confidential_label = forms.ChoiceField(choices=(), required=False)
+    confidential_label = forms.CharField(max_length=100, required=False, label="Chief-only label")
     file = forms.FileField(help_text="PDF files only. Encrypted PDFs are not accepted.")
 
     def __init__(self, *args, user, **kwargs):
@@ -23,28 +23,20 @@ class ManualUploadForm(forms.Form):
             is_active=True,
         ).distinct()
         self.fields["department"].queryset = departments
-        labels = (
-            user.confidentialauthorization_set.filter(
-                is_active=True,
-                department__in=departments,
-                department__is_active=True,
-            )
-            .order_by("label")
-            .values_list("label", flat=True)
-            .distinct()
-        )
-        labels = list(labels)
-        # Ordinary employees may submit normal documents only. Confidential is
-        # presented as an option only when the user has an explicit, active
-        # confidential authorization in one of their active departments.
         self.fields["sensitivity"].choices = [(Document.Sensitivity.NORMAL, "Normal")]
-        if labels:
+        roles = set(
+            user.membership_set.filter(
+                department__in=departments, is_active=True
+            ).values_list("role", flat=True)
+        )
+        if roles & {"supervisor", "chief"}:
             self.fields["sensitivity"].choices.append(
-                (Document.Sensitivity.CONFIDENTIAL, "Confidential")
+                (Document.Sensitivity.SUPERVISOR, "Supervisor")
             )
-        self.fields["confidential_label"].choices = [("", "---------")] + [
-            (label, label) for label in labels
-        ]
+        if "chief" in roles:
+            self.fields["sensitivity"].choices.append(
+                (Document.Sensitivity.CONFIDENTIAL, "Chief only")
+            )
 
     def clean_file(self):
         upload = self.cleaned_data["file"]
@@ -57,9 +49,11 @@ class ManualUploadForm(forms.Form):
         sensitivity = cleaned.get("sensitivity")
         label = cleaned.get("confidential_label", "").strip()
         if sensitivity == Document.Sensitivity.CONFIDENTIAL and not label:
-            self.add_error("confidential_label", "A confidential label is required.")
-        if sensitivity == Document.Sensitivity.NORMAL and label:
-            self.add_error("confidential_label", "Normal documents cannot have a label.")
+            self.add_error("confidential_label", "A chief-only label is required.")
+        if sensitivity != Document.Sensitivity.CONFIDENTIAL and label:
+            self.add_error(
+                "confidential_label", "Only chief-only documents can have a label."
+            )
         if department and sensitivity and not AccessPolicy.can_upload_to(
             self.user, department, sensitivity, label
         ):

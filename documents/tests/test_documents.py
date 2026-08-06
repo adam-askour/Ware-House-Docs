@@ -14,7 +14,7 @@ from audit.models import AuditEvent
 from documents.forms import ManualUploadForm
 from documents.models import Document, DocumentDepartment
 from documents.services import validate_pdf
-from organization.models import ConfidentialAuthorization, Department, Membership
+from organization.models import Department, Membership
 
 pytestmark = pytest.mark.django_db
 
@@ -136,8 +136,8 @@ def test_unauthorized_user_cannot_discover_preview_or_download(client, tmp_path)
     assert AuditEvent.objects.filter(actor=outsider).count() == 0
 
 
-def test_confidential_document_requires_matching_explicit_grant(client, tmp_path):
-    user = make_user("authorized")
+def test_chief_only_document_requires_department_chief(client, tmp_path):
+    user = make_user("employee")
     department = Department.objects.create(name="People", code="people")
     Membership.objects.create(user=user, department=department)
     client.force_login(user)
@@ -150,10 +150,9 @@ def test_confidential_document_requires_matching_explicit_grant(client, tmp_path
         assert denied.status_code == 200
         assert Document.objects.count() == 0
 
-        ConfidentialAuthorization.objects.create(
-            user=user, department=department, label="PAYROLL"
-        )
-        data["confidential_label"] = "PAYROLL"
+        membership = Membership.objects.get(user=user, department=department)
+        membership.role = Membership.Role.CHIEF
+        membership.save(update_fields=("role",))
         accepted = upload(client, department, **data)
         assert accepted.status_code == 302
         assert b"Safety procedure" in client.get(reverse("documents:list")).content
@@ -173,15 +172,18 @@ def test_ordinary_employee_is_not_offered_confidential_classification(client):
     assert b'value="confidential"' not in response.content
 
 
-def test_authorized_employee_is_offered_confidential_classification():
-    user = make_user("confidential-authorized")
+def test_supervisor_and_chief_are_offered_their_classification_levels():
+    user = make_user("supervisor")
     department = Department.objects.create(name="Legal", code="legal")
-    Membership.objects.create(user=user, department=department)
-    ConfidentialAuthorization.objects.create(
-        user=user, department=department, label="Legal confidential"
+    membership = Membership.objects.create(
+        user=user, department=department, role=Membership.Role.SUPERVISOR
     )
 
     form = ManualUploadForm(user=user)
-    assert (Document.Sensitivity.CONFIDENTIAL, "Confidential") in form.fields[
-        "sensitivity"
-    ].choices
+    assert (Document.Sensitivity.SUPERVISOR, "Supervisor") in form.fields["sensitivity"].choices
+    assert (Document.Sensitivity.CONFIDENTIAL, "Chief only") not in form.fields["sensitivity"].choices
+
+    membership.role = Membership.Role.CHIEF
+    membership.save(update_fields=("role",))
+    form = ManualUploadForm(user=user)
+    assert (Document.Sensitivity.CONFIDENTIAL, "Chief only") in form.fields["sensitivity"].choices

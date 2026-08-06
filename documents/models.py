@@ -22,7 +22,8 @@ class Document(models.Model):
 
     class Sensitivity(models.TextChoices):
         NORMAL = "normal", "Normal"
-        CONFIDENTIAL = "confidential", "Confidential"
+        SUPERVISOR = "supervisor", "Supervisor"
+        CONFIDENTIAL = "confidential", "Chief only"
 
     title = models.CharField(max_length=255)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.DRAFT)
@@ -43,8 +44,10 @@ class Document(models.Model):
     def clean(self):
         if self.sensitivity == self.Sensitivity.CONFIDENTIAL and not self.confidential_label.strip():
             raise ValidationError({"confidential_label": "A confidential label is required."})
-        if self.sensitivity == self.Sensitivity.NORMAL and self.confidential_label:
-            raise ValidationError({"confidential_label": "Normal documents cannot have a label."})
+        if self.sensitivity != self.Sensitivity.CONFIDENTIAL and self.confidential_label:
+            raise ValidationError(
+                {"confidential_label": "Only chief-only documents can have a label."}
+            )
         if (
             self.pk
             and self.status == self.Status.PUBLISHED

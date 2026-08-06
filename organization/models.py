@@ -15,6 +15,7 @@ class Department(models.Model):
 class Membership(models.Model):
     class Role(models.TextChoices):
         MEMBER = "member", "Employee"
+        SUPERVISOR = "supervisor", "Supervisor"
         CHIEF = "chief", "Department chief"
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

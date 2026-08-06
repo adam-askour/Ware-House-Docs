@@ -45,7 +45,7 @@ def test_administrator_does_not_automatically_receive_confidential_access():
     department = Department.objects.create(name="Legal", code="legal")
     assert not AccessPolicy.has_confidential_authorization(admin, department)
     ConfidentialAuthorization.objects.create(user=admin, department=department, label="Legal confidential")
-    assert AccessPolicy.has_confidential_authorization(admin, department, "Legal confidential")
+    assert not AccessPolicy.has_confidential_authorization(admin, department, "Legal confidential")
 
 
 def test_chief_receives_confidential_access_without_staff_or_explicit_grant():
@@ -57,19 +57,28 @@ def test_chief_receives_confidential_access_without_staff_or_explicit_grant():
     assert AccessPolicy.has_confidential_authorization(chief, department, "Any label")
 
 
-def test_confidential_authorization_label_is_case_insensitive():
+def test_explicit_grant_does_not_override_chief_only_visibility():
     user = make_user("sam")
     department = Department.objects.create(name="Payroll", code="payroll")
     ConfidentialAuthorization.objects.create(
         user=user, department=department, label="Payroll confidential"
     )
 
-    assert AccessPolicy.has_confidential_authorization(
+    assert not AccessPolicy.has_confidential_authorization(
         user, department, "payroll confidential"
     )
-    assert not AccessPolicy.has_confidential_authorization(
-        user, department, "payroll restricted"
+
+
+def test_supervisor_authority_is_between_employee_and_chief():
+    user = make_user("supervisor")
+    department = Department.objects.create(name="Operations", code="operations")
+    Membership.objects.create(
+        user=user, department=department, role=Membership.Role.SUPERVISOR
     )
+
+    assert AccessPolicy.is_department_member(user, department)
+    assert AccessPolicy.is_department_supervisor(user, department)
+    assert not AccessPolicy.is_department_chief(user, department)
 
 
 def test_inactive_membership_and_user_are_denied():
