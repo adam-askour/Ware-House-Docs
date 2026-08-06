@@ -20,7 +20,7 @@ LOCAL_APPS = [
     "accounts",
     "organization",
     "documents",
-    "ingestion",
+    "ingestion.apps.IngestionConfig",
     "ocr",
     "classification",
     "search",
@@ -92,6 +92,7 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "var" / "static"
 MEDIA_ROOT = BASE_DIR / "var" / "protected"
 # There is intentionally no MEDIA_URL: protected files are never public.
+INGESTION_STABILITY_SECONDS = int(os.environ.get("INGESTION_STABILITY_SECONDS", "5"))
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 SESSION_COOKIE_HTTPONLY = True

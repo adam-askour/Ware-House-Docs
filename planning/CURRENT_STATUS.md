@@ -1,12 +1,12 @@
 # Current Project Status
 
-Last updated: 2026-08-04 (Africa/Casablanca)
+Last updated: 2026-08-06 (Africa/Casablanca)
 
 ## Current milestone
 
-Phase 0 infrastructure, Phase 1 identity and authorization, and Phase 2
-document core and manual upload are complete. The next milestone is Phase 3
-scanner simulation and ingestion.
+Phase 0 infrastructure, Phase 1 identity and authorization, Phase 2 document
+core and manual upload, and Phase 3 scanner simulation and ingestion are
+complete. The next milestone is Phase 4 OCR and searchable PDF generation.
 
 ## Phase 1 delivered
 
@@ -58,6 +58,33 @@ The Phase 2 exit criterion is satisfied: authorized employees can safely
 upload, list, preview, and download test PDFs, and unauthorized users cannot
 discover or retrieve their contents.
 
+## Phase 3 delivered
+
+- Company-wide shared scanner records independent of department ownership.
+- Simulator command submitting a PDF, scanner identifier, employee scan code,
+  scan timestamp, and optional idempotency key.
+- Automatic employee identification and department routing from the scan code;
+  employees never select a destination department.
+- Safe routing requires exactly one active membership in an active department;
+  ambiguous or missing routes are quarantined instead of guessed.
+- Stable-file age and non-empty checks prevent premature consumption.
+- Idempotent ingestion ledger with scanner, employee, department, checksum,
+  document, timestamps, state, attempts, and failure information.
+- SHA-256 exact-duplicate detection without unintended document creation.
+- Quarantine handling for unknown/inactive codes, inactive scanners, ambiguous
+  memberships, and invalid, corrupt, or encrypted PDFs.
+- Successful scans create protected version-one documents immediately in
+  `Processing` status, with status and upload audit events.
+
+## Phase 3 verification
+
+Verified on 2026-08-06:
+
+- Full test suite: 43 passed.
+- Ruff linting: passed.
+- Django system checks: passed with no issues.
+- Migration consistency check: no changes detected.
+
 ## Running environment
 
 The Docker Compose environment established in Phase 0 contains PostgreSQL,
@@ -72,13 +99,5 @@ C:\Users\PC\AppData\Local\Programs\DockerDesktop\resources\bin\docker.exe
 
 ## Next step
 
-Begin Phase 3: scanner simulation and ingestion.
-
-The agreed implementation estimate is 8–12 focused working hours (roughly one
-long development day or two normal development days), with up to 14–16 hours
-if Docker or Celery integration exposes unexpected issues.
-
-Start with scanner records and intake configuration, followed by a scanner
-simulator, stable-file detection, an idempotent ingestion ledger,
-checksum-based duplicate handling, quarantine/failure areas, and immediate
-Processing document creation.
+Begin Phase 4: OCR and searchable PDF generation, starting with queued OCR jobs,
+existing-text detection, page text storage, and conservative failure handling.

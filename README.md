@@ -6,10 +6,25 @@ management.
 
 ## Current state
 
-Phases 0–2 provide the infrastructure, identity and department authorization,
-protected PDF storage, manual upload, permission-filtered listing, protected
-preview/download endpoints, and document access auditing. Product features are
-added strictly in the order in `planning/IMPLEMENTATION_ROADMAP.md`.
+Phases 0–3 provide the infrastructure, identity and department authorization,
+protected PDF storage, manual upload, permission-filtered access, document
+auditing, and shared-scanner simulation with automatic employee-code routing.
+Product features are added strictly in the order in
+`planning/IMPLEMENTATION_ROADMAP.md`.
+
+## Scanner simulation
+
+Create an active scanner in Django administration, then submit a stable test PDF:
+
+```text
+python manage.py simulate_scan sample.pdf --scanner reception-1 --employee-code 123456
+```
+
+The employee code determines the employee and their active department; scanner
+location never determines ownership. Automatic routing requires exactly one
+active department membership. Unknown/inactive codes, invalid PDFs, inactive
+scanners, and ambiguous memberships are quarantined. `--event-key` can carry a
+scanner event identifier for idempotent retries.
 
 ## Local development
 
