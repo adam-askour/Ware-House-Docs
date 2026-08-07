@@ -48,18 +48,41 @@ Phase 2 is complete. Its exit criterion is satisfied: authorized employees can
 upload, list, preview, and download test PDFs, while unauthorized requests
 receive no protected content.
 
+## Phase 3 — Scanner simulator and ingestion
+
+- [x] Scanner records and stable-file detection
+- [x] Idempotent ingestion ledger and exact-duplicate detection
+- [x] Safe employee/department routing and quarantine handling
+- [x] Immediate Processing documents and automatic OCR queueing
+
+Phase 3 is complete. Simulated scans appear automatically for correctly resolved
+employees without guessing ambiguous routes.
+
+## Phase 4 — OCR and searchable PDF
+
+- [x] Durable OCR job pipeline and automatic retries
+- [x] Existing-text detection and page-numbered text storage
+- [x] OCRmyPDF orientation, deskew, conservative cleanup, and searchable derivatives
+- [x] English, French, and Arabic Tesseract configuration
+- [x] Quality warnings and administrator-visible failures
+- [x] Explicit administrator retry action for failed OCR jobs
+- [x] Access-controlled, vendored PDF.js page-by-page viewer
+- [x] Original checksum and source-file preservation
+
+Phase 4 is complete. Representative multilingual content is stored by page,
+image PDFs produce searchable derivatives or warnings, and authorized users can
+view PDFs page by page.
+
 ## Current verification
 
-Verified on 2026-08-04:
+Verified on 2026-08-07:
 
-- Full test suite: 32 passed
+- Full test suite: 53 passed
 - Ruff linting: passed
 - Django system checks: passed with no issues
 - Migration consistency check: no changes detected
 
 ## Next milestone
 
-Phase 3 — scanner simulator and ingestion. This includes scanner records,
-stable-file detection, an idempotent ingestion ledger, duplicate detection,
-  quarantine/failure handling, and immediate Processing documents. Uncertain
-  scans return to the scanning employee, with department-chief escalation.
+Phase 5 — permission-filtered full-text search across titles, metadata, and OCR
+page content.

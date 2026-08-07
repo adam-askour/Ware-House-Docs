@@ -140,3 +140,28 @@ def queue_ocr(version):
 
     transaction.on_commit(lambda: process_ocr_job_task.delay(job.pk))
     return job
+
+@transaction.atomic
+def retry_ocr(job):
+    """Requeue a failed OCR job without discarding its source document."""
+    job = OcrJob.objects.select_for_update().get(pk=job.pk)
+    if job.status != OcrJob.Status.FAILED:
+        raise ValueError("Only failed OCR jobs can be retried.")
+    job.status = OcrJob.Status.QUEUED
+    job.failure_reason = ""
+    job.started_at = None
+    job.completed_at = None
+    job.queued_at = timezone.now()
+    job.save(
+        update_fields=(
+            "status",
+            "failure_reason",
+            "started_at",
+            "completed_at",
+            "queued_at",
+        )
+    )
+    from .tasks import process_ocr_job_task
+
+    transaction.on_commit(lambda: process_ocr_job_task.delay(job.pk))
+    return job

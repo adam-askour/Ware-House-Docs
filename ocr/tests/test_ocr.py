@@ -2,6 +2,7 @@ import hashlib
 import shutil
 from io import BytesIO
 from types import SimpleNamespace
+from unittest.mock import patch
 
 import pytest
 from django.contrib.auth import get_user_model
@@ -16,7 +17,7 @@ from documents.models import (
     StoredFile,
 )
 from ocr.models import OcrJob
-from ocr.services import has_meaningful_text, process_ocr_job
+from ocr.services import has_meaningful_text, process_ocr_job, retry_ocr
 from organization.models import Department
 
 pytestmark = pytest.mark.django_db
@@ -92,3 +93,50 @@ def test_ocr_failure_is_recorded_and_source_is_retained(tmp_path):
         assert source.read() == original
     result.version.document.refresh_from_db()
     assert result.version.document.status == Document.Status.PROCESSING
+
+@pytest.mark.parametrize(
+    "pages",
+    [
+        ["Facture fran\u00e7aise imprim\u00e9e avec un montant total v\u00e9rifiable."],
+        [
+            "\u062e\u0637\u0627\u0628 \u0625\u062f\u0627\u0631\u064a "
+            "\u0639\u0631\u0628\u064a \u0645\u0637\u0628\u0648\u0639 "
+            "\u064a\u062d\u062a\u0648\u064a \u0639\u0644\u0649 \u0646\u0635 "
+            "\u0648\u0627\u0636\u062d \u0648\u0642\u0627\u0628\u0644 \u0644\u0644\u0628\u062d\u062b."
+        ],
+        ["Printed English contract with searchable terms and conditions."],
+    ],
+)
+def test_representative_language_text_is_stored_on_its_page(tmp_path, pages):
+    with override_settings(MEDIA_ROOT=tmp_path):
+        job, _ = make_job(pdf_bytes())
+        with patch("ocr.services.extract_page_text", return_value=pages):
+            result = process_ocr_job(job.pk)
+
+    assert result.status == OcrJob.Status.SUCCEEDED
+    assert result.method == OcrJob.Method.EMBEDDED_TEXT
+    assert list(result.pages.values_list("page_number", "text")) == [(1, pages[0])]
+
+
+def test_failed_job_can_be_explicitly_requeued(django_capture_on_commit_callbacks, tmp_path):
+    with override_settings(MEDIA_ROOT=tmp_path):
+        job, _ = make_job(pdf_bytes())
+        job.status = OcrJob.Status.FAILED
+        job.failure_reason = "temporary OCR failure"
+        job.save(update_fields=("status", "failure_reason"))
+
+        with patch("ocr.tasks.process_ocr_job_task.delay") as delay:
+            with django_capture_on_commit_callbacks(execute=True):
+                retried = retry_ocr(job)
+
+    assert retried.status == OcrJob.Status.QUEUED
+    assert retried.failure_reason == ""
+    assert retried.completed_at is None
+    delay.assert_called_once_with(job.pk)
+
+
+def test_non_failed_job_cannot_be_requeued(tmp_path):
+    with override_settings(MEDIA_ROOT=tmp_path):
+        job, _ = make_job(pdf_bytes())
+        with pytest.raises(ValueError, match="Only failed"):
+            retry_ocr(job)

@@ -61,6 +61,23 @@ def manual_upload(request):
     return render(request, "documents/manual_upload.html", {"form": form})
 
 
+@login_required
+@require_GET
+def viewer(request, pk):
+    document = _accessible_document(request, pk)
+    version = document.versions.select_related("stored_file").first()
+    if version is None:
+        return get_object_or_404(document.versions, pk=None)
+    try:
+        ocr_job = version.ocr_job
+    except version._meta.model.ocr_job.RelatedObjectDoesNotExist:
+        ocr_job = None
+    return render(
+        request,
+        "documents/viewer.html",
+        {"document": document, "version": version, "ocr_job": ocr_job},
+    )
+
 def _serve(request, pk, *, attachment):
     document = _accessible_document(request, pk)
     version = document.versions.select_related("stored_file").first()

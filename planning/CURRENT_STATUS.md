@@ -1,12 +1,12 @@
 # Current Project Status
 
-Last updated: 2026-08-06 (Africa/Casablanca)
+Last updated: 2026-08-07 (Africa/Casablanca)
 
 ## Current milestone
 
 Phase 0 infrastructure, Phase 1 identity and authorization, Phase 2 document
 core and manual upload, and Phase 3 scanner simulation and ingestion are
-complete. Phase 4 OCR and searchable PDF generation is in progress.
+complete. Phase 4 OCR and searchable PDF generation is complete.
 
 ## Phase 1 delivered
 
@@ -99,7 +99,7 @@ If `docker` is not available on `PATH`, its verified location is:
 C:\Users\PC\AppData\Local\Programs\DockerDesktop\resources\bin\docker.exe
 ```
 
-## Phase 4 delivered so far
+## Phase 4 delivered
 
 - Durable queued/running/succeeded/failed OCR jobs for each document version.
 - Existing-text detection that avoids unnecessary OCR.
@@ -109,8 +109,23 @@ C:\Users\PC\AppData\Local\Programs\DockerDesktop\resources\bin\docker.exe
 - Original-file preservation and searchable derivatives used for inline preview.
 - Automatic OCR queueing for scanner ingestion and manual uploads.
 - Administrator-visible OCR job failures and page output.
+- Vendored PDF.js page-by-page viewer with page navigation and zoom controls.
+- Automatic transient-failure retries plus an explicit administrator retry action.
+
+## Phase 4 verification
+
+Verified on 2026-08-07:
+
+- Full test suite: 53 passed.
+- Ruff linting: passed.
+- Django system checks: passed with no issues.
+- Migration consistency check: no changes detected.
+
+The Phase 4 exit criterion is satisfied: representative printed-language content
+is retained page by page, image PDFs receive searchable derivatives or clear
+warnings, and authorized users can view documents page by page.
 
 ## Next step
 
-Add the PDF.js page-by-page viewer and an explicit retry action for failed OCR
-jobs, then verify representative French, Arabic, English, and rotated samples.
+Phase 5 — permission-filtered full-text search across titles, metadata, and OCR
+page content.

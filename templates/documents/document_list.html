@@ -28,7 +28,7 @@
         <td>{{ document.title }}</td>
         <td>{% for assignment in document.assignments.all %}{{ assignment.department.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
         <td>{{ document.get_status_display }}</td>
-        <td><a href="{% url 'documents:preview' document.pk %}">Preview</a> <a href="{% url 'documents:download' document.pk %}">Download</a></td>
+        <td><a href="{% url 'documents:viewer' document.pk %}">View</a> <a href="{% url 'documents:download' document.pk %}">Download</a></td>
       </tr>{% endfor %}</tbody>
     </table>
   {% else %}<p>No accessible documents found.</p>{% endif %}

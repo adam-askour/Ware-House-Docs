@@ -187,3 +187,22 @@ def test_supervisor_and_chief_are_offered_their_classification_levels():
     membership.save(update_fields=("role",))
     form = ManualUploadForm(user=user)
     assert (Document.Sensitivity.CONFIDENTIAL, "Chief only") in form.fields["sensitivity"].choices
+
+def test_page_viewer_is_access_controlled_and_uses_protected_pdf_endpoint(client, tmp_path):
+    owner = make_user("viewer-owner")
+    outsider = make_user("viewer-outsider")
+    department = Department.objects.create(name="Archive", code="archive")
+    Membership.objects.create(user=owner, department=department)
+    client.force_login(owner)
+    with override_settings(MEDIA_ROOT=tmp_path):
+        upload(client, department)
+        document = Document.objects.get()
+        response = client.get(reverse("documents:viewer", args=(document.pk,)))
+        assert response.status_code == 200
+        assert reverse("documents:preview", args=(document.pk,)).encode() in response.content
+        assert b"pdf.min.mjs" in response.content
+
+        client.force_login(outsider)
+        denied = client.get(reverse("documents:viewer", args=(document.pk,)))
+        assert denied.status_code == 404
+        assert document.title.encode() not in denied.content

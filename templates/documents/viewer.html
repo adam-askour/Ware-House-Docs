@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ document.title }} | Document Management System{% endblock %}
+{% block content %}
+  <header>
+    <h1>{{ document.title }}</h1>
+    <p>
+      <a href="{% url 'documents:list' %}">Back to documents</a>
+      <a href="{% url 'documents:download' document.pk %}">Download original</a>
+    </p>
+    {% if ocr_job %}
+      <p>OCR: {{ ocr_job.get_status_display }}{% if ocr_job.warning %} — {{ ocr_job.warning }}{% endif %}</p>
+    {% endif %}
+  </header>
+  <section aria-label="PDF viewer">
+    <div>
+      <button type="button" id="previous-page">Previous</button>
+      <label for="page-number">Page</label>
+      <input id="page-number" type="number" min="1" value="1" inputmode="numeric">
+      <span>of <span id="page-count">…</span></span>
+      <button type="button" id="next-page">Next</button>
+      <button type="button" id="zoom-out" aria-label="Zoom out">-</button>
+      <button type="button" id="zoom-in" aria-label="Zoom in">+</button>
+    </div>
+    <p id="viewer-status" role="status">Loading document…</p>
+    <canvas id="pdf-page" aria-label="PDF page 1"></canvas>
+  </section>
+  <script type="module">
+    import * as pdfjsLib from "{% static 'vendor/pdfjs/pdf.min.mjs' %}";
+
+    pdfjsLib.GlobalWorkerOptions.workerSrc = "{% static 'vendor/pdfjs/pdf.worker.min.mjs' %}";
+    const canvas = document.getElementById("pdf-page");
+    const context = canvas.getContext("2d");
+    const pageInput = document.getElementById("page-number");
+    const pageCount = document.getElementById("page-count");
+    const status = document.getElementById("viewer-status");
+    let pdf = null;
+    let currentPage = 1;
+    let scale = 1.25;
+    let rendering = false;
+    let pendingPage = null;
+
+    async function renderPage(number) {
+      rendering = true;
+      const page = await pdf.getPage(number);
+      const viewport = page.getViewport({scale});
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      canvas.setAttribute("aria-label", `PDF page ${number}`);
+      await page.render({canvasContext: context, viewport}).promise;
+      currentPage = number;
+      pageInput.value = number;
+      status.textContent = `Page ${number} displayed.`;
+      rendering = false;
+      if (pendingPage !== null) {
+        const next = pendingPage;
+        pendingPage = null;
+        renderPage(next);
+      }
+    }
+
+    function requestPage(number) {
+      if (!pdf) return;
+      const bounded = Math.max(1, Math.min(pdf.numPages, number));
+      if (rendering) pendingPage = bounded;
+      else renderPage(bounded);
+    }
+
+    try {
+      pdf = await pdfjsLib.getDocument({
+        url: "{% url 'documents:preview' document.pk %}",
+        wasmUrl: "{% static 'vendor/pdfjs/wasm/' %}",
+      }).promise;
+      pageCount.textContent = pdf.numPages;
+      pageInput.max = pdf.numPages;
+      await renderPage(1);
+    } catch (error) {
+      status.textContent = "The PDF could not be displayed. You can still download the original.";
+    }
+
+    document.getElementById("previous-page").addEventListener("click", () => requestPage(currentPage - 1));
+    document.getElementById("next-page").addEventListener("click", () => requestPage(currentPage + 1));
+    pageInput.addEventListener("change", () => requestPage(Number(pageInput.value)));
+    document.getElementById("zoom-out").addEventListener("click", () => {
+      scale = Math.max(0.5, scale - 0.25);
+      requestPage(currentPage);
+    });
+    document.getElementById("zoom-in").addEventListener("click", () => {
+      scale = Math.min(3, scale + 0.25);
+      requestPage(currentPage);
+    });
+  </script>
+{% endblock %}

@@ -90,6 +90,7 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "var" / "static"
+STATICFILES_DIRS = [BASE_DIR / "static"]
 MEDIA_ROOT = BASE_DIR / "var" / "protected"
 # There is intentionally no MEDIA_URL: protected files are never public.
 INGESTION_STABILITY_SECONDS = int(os.environ.get("INGESTION_STABILITY_SECONDS", "5"))
