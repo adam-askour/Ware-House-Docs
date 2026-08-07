@@ -21,7 +21,7 @@ LOCAL_APPS = [
     "organization",
     "documents",
     "ingestion.apps.IngestionConfig",
-    "ocr",
+    "ocr.apps.OcrConfig",
     "classification",
     "search",
     "access",
@@ -93,6 +93,7 @@ STATIC_ROOT = BASE_DIR / "var" / "static"
 MEDIA_ROOT = BASE_DIR / "var" / "protected"
 # There is intentionally no MEDIA_URL: protected files are never public.
 INGESTION_STABILITY_SECONDS = int(os.environ.get("INGESTION_STABILITY_SECONDS", "5"))
+OCR_LANGUAGES = os.environ.get("OCR_LANGUAGES", "eng+fra+ara")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 SESSION_COOKIE_HTTPONLY = True

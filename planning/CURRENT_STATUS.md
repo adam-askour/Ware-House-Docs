@@ -6,7 +6,7 @@ Last updated: 2026-08-06 (Africa/Casablanca)
 
 Phase 0 infrastructure, Phase 1 identity and authorization, Phase 2 document
 core and manual upload, and Phase 3 scanner simulation and ingestion are
-complete. The next milestone is Phase 4 OCR and searchable PDF generation.
+complete. Phase 4 OCR and searchable PDF generation is in progress.
 
 ## Phase 1 delivered
 
@@ -99,7 +99,18 @@ If `docker` is not available on `PATH`, its verified location is:
 C:\Users\PC\AppData\Local\Programs\DockerDesktop\resources\bin\docker.exe
 ```
 
+## Phase 4 delivered so far
+
+- Durable queued/running/succeeded/failed OCR jobs for each document version.
+- Existing-text detection that avoids unnecessary OCR.
+- OCRmyPDF derivatives with orientation detection, deskew, conservative cleanup,
+  and English, French, and Arabic Tesseract configuration.
+- Page-numbered extracted text, warnings, attempt counts, and failure details.
+- Original-file preservation and searchable derivatives used for inline preview.
+- Automatic OCR queueing for scanner ingestion and manual uploads.
+- Administrator-visible OCR job failures and page output.
+
 ## Next step
 
-Begin Phase 4: OCR and searchable PDF generation, starting with queued OCR jobs,
-existing-text detection, page text storage, and conservative failure handling.
+Add the PDF.js page-by-page viewer and an explicit retry action for failed OCR
+jobs, then verify representative French, Arabic, English, and rotated samples.

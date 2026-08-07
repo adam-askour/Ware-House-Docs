@@ -115,7 +115,7 @@ def ingest_scan(*, scanner, employee_code, upload, scanned_at, idempotency_key):
     stored = StoredFile(sha256=checksum, size=len(content), media_type="application/pdf")
     stored.file.save(record.original_filename, ContentFile(content), save=False)
     stored.save()
-    DocumentVersion.objects.create(
+    version = DocumentVersion.objects.create(
         document=document,
         number=1,
         stored_file=stored,
@@ -129,4 +129,7 @@ def ingest_scan(*, scanner, employee_code, upload, scanned_at, idempotency_key):
     record.document = document
     record.state = IngestionRecord.State.PROCESSED
     record.save()
+    from ocr.services import queue_ocr
+
+    queue_ocr(version)
     return record

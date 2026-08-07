@@ -70,8 +70,15 @@ def _serve(request, pk, *, attachment):
     AuditEvent.objects.create(
         actor=request.user, document=document, action=action, ip_address=_client_ip(request)
     )
+    stored_file = version.stored_file
+    if not attachment:
+        try:
+            if version.ocr_job.searchable_file_id:
+                stored_file = version.ocr_job.searchable_file
+        except version._meta.model.ocr_job.RelatedObjectDoesNotExist:
+            pass
     response = FileResponse(
-        version.stored_file.file.open("rb"),
+        stored_file.file.open("rb"),
         content_type="application/pdf",
         as_attachment=attachment,
         filename=Path(version.original_filename).name,

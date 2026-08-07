@@ -46,18 +46,20 @@ def create_manual_document(*, user, title, department, upload, sensitivity, labe
     stored = StoredFile(sha256=checksum, size=len(content), media_type="application/pdf")
     stored.file.save(upload.name, ContentFile(content), save=False)
     stored.save()
-    DocumentVersion.objects.create(
+    version = DocumentVersion.objects.create(
         document=document,
         number=1,
         stored_file=stored,
         original_filename=upload.name,
         created_by=user,
     )
-    document.status = Document.Status.PUBLISHED
-    document.full_clean()
-    document.save(update_fields=("status", "updated_at"))
-    DocumentStatusEvent.objects.create(document=document, status=document.status, actor=user)
     AuditEvent.objects.create(
         actor=user, document=document, action=AuditEvent.Action.UPLOAD, ip_address=ip
     )
+    document.status = Document.Status.PROCESSING
+    document.save(update_fields=("status", "updated_at"))
+    DocumentStatusEvent.objects.create(document=document, status=document.status, actor=user)
+    from ocr.services import queue_ocr
+
+    queue_ocr(version)
     return document
