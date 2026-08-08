@@ -73,16 +73,30 @@ Phase 4 is complete. Representative multilingual content is stored by page,
 image PDFs produce searchable derivatives or warnings, and authorized users can
 view PDFs page by page.
 
+## Phase 5 — Search
+
+- [x] PostgreSQL full-text page index with a GIN index
+- [x] Weighted title, metadata, and OCR body ranking
+- [x] Permission filtering before matching and visible result counts
+- [x] Page-numbered, safely highlighted snippets
+- [x] Status, sensitivity, and department filters
+- [x] Direct links to the matching PDF.js viewer page
+- [x] Empty-query and no-access result behavior
+
+Phase 5 is complete. Users can search only the documents they are authorized to
+see, find multilingual OCR content by page, and open the best matching page
+directly in the protected viewer.
+
 ## Current verification
 
-Verified on 2026-08-07:
+Verified on 2026-08-08:
 
-- Full test suite: 53 passed
+- Full test suite: 60 passed
 - Ruff linting: passed
 - Django system checks: passed with no issues
 - Migration consistency check: no changes detected
 
 ## Next milestone
 
-Phase 5 — permission-filtered full-text search across titles, metadata, and OCR
-page content.
+Phase 6 — deterministic classification suggestions, confidence and explanations,
+safe publication thresholds, and authorized human review.

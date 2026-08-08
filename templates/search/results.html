@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load search_highlight %}
+{% block title %}Search | Document Management System{% endblock %}
+{% block content %}
+  <header>
+    <h1>Search documents</h1>
+    <p><a href="{% url 'documents:list' %}">Back to documents</a></p>
+  </header>
+  <form method="get" role="search">
+    <label for="q">Words in title, metadata, or document text</label>
+    <input id="q" name="q" value="{{ query }}" required autofocus>
+    <label for="status">Status</label>
+    <select id="status" name="status">
+      <option value="">All statuses</option>
+      {% for value, label in statuses %}<option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+    <label for="sensitivity">Visibility</label>
+    <select id="sensitivity" name="sensitivity">
+      <option value="">All visibility levels</option>
+      {% for value, label in sensitivities %}<option value="{{ value }}" {% if selected_sensitivity == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+    <label for="department">Department code</label>
+    <input id="department" name="department" value="{{ department }}">
+    <button type="submit">Search</button>
+  </form>
+  {% if query %}
+    <p>{{ results|length }} accessible document{{ results|length|pluralize }} found.</p>
+    {% if results %}
+      <ol>
+        {% for result in results %}
+          <li>
+            <h2><a href="{% url 'documents:viewer' result.document.pk %}?page={{ result.page_number }}">{{ result.document.title }}</a></h2>
+            <p>Page {{ result.page_number }} · {{ result.document.get_status_display }}</p>
+            {% if result.snippet %}<p>{{ result.snippet|highlight_search }}</p>{% endif %}
+          </li>
+        {% endfor %}
+      </ol>
+    {% else %}<p>No accessible documents match your search.</p>{% endif %}
+  {% else %}<p>Enter one or more words to search accessible documents.</p>{% endif %}
+{% endblock %}

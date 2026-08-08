@@ -1,12 +1,13 @@
 # Current Project Status
 
-Last updated: 2026-08-07 (Africa/Casablanca)
+Last updated: 2026-08-08 (Africa/Casablanca)
 
 ## Current milestone
 
 Phase 0 infrastructure, Phase 1 identity and authorization, Phase 2 document
 core and manual upload, and Phase 3 scanner simulation and ingestion are
-complete. Phase 4 OCR and searchable PDF generation is complete.
+complete. Phase 4 OCR and searchable PDF generation and Phase 5 permission-filtered
+search are complete.
 
 ## Phase 1 delivered
 
@@ -125,7 +126,32 @@ The Phase 4 exit criterion is satisfied: representative printed-language content
 is retained page by page, image PDFs receive searchable derivatives or clear
 warnings, and authorized users can view documents page by page.
 
+## Phase 5 delivered
+
+- Denormalized PostgreSQL page search index populated from completed OCR jobs.
+- GIN-indexed weighted vectors: title (A), metadata (B), and OCR page body (C).
+- Central access-policy filtering before search matching, ranking, and counts.
+- French, Arabic exact-token, and English matching using the `simple` text-search
+  configuration.
+- Safely highlighted page snippets with matching page numbers.
+- Combined department, status, and sensitivity filters.
+- Protected PDF.js viewer deep-links that open the matching page.
+- Migration-time indexing for documents that completed OCR before Phase 5.
+
+## Phase 5 verification
+
+Verified on 2026-08-08:
+
+- Full test suite: 60 passed.
+- Ruff linting: passed.
+- Django system checks: passed with no issues.
+- Migration consistency check: no changes detected.
+
+The Phase 5 exit criterion is satisfied: users can find authorized PDFs by title,
+metadata, and OCR content without knowing filenames, while inaccessible documents
+do not appear or affect result counts.
+
 ## Next step
 
-Phase 5 — permission-filtered full-text search across titles, metadata, and OCR
-page content.
+Phase 6 — deterministic classification suggestions with confidence, explanations,
+safe publication thresholds, and authorized human review.

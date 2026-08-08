@@ -129,6 +129,9 @@ def process_ocr_job(job_id, *, runner=subprocess.run):
         DocumentStatusEvent.objects.create(
             document=document, status=document.status, actor=version.created_by
         )
+    from search.services import rebuild_document_search
+
+    rebuild_document_search(document)
     return job
 
 

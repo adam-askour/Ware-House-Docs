@@ -35,7 +35,8 @@
     const pageCount = document.getElementById("page-count");
     const status = document.getElementById("viewer-status");
     let pdf = null;
-    let currentPage = 1;
+    const requestedPage = Number(new URLSearchParams(window.location.search).get("page")) || 1;
+    let currentPage = requestedPage;
     let scale = 1.25;
     let rendering = false;
     let pendingPage = null;
@@ -73,7 +74,7 @@
       }).promise;
       pageCount.textContent = pdf.numPages;
       pageInput.max = pdf.numPages;
-      await renderPage(1);
+      await renderPage(Math.max(1, Math.min(pdf.numPages, requestedPage)));
     } catch (error) {
       status.textContent = "The PDF could not be displayed. You can still download the original.";
     }

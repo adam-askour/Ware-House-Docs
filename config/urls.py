@@ -13,5 +13,6 @@ urlpatterns = [
         name="password_change_done",
     ),
     path("documents/", include("documents.urls")),
+    path("search/", include("search.urls")),
     path("", include("core.urls")),
 ]
